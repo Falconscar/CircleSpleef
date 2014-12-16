@@ -181,16 +181,16 @@ void GameField::ResetField() {
 	int startY = 20;
 
 	if (!BlockList.empty()) {
-		for (ii = BlockList.begin(); ii != BlockList.end(); ii++) {
-			ii->playercount = 0;
-			ii->life = 5;
-			ii->lifetodrop = 0;
-			ii->playeronfield[0] = false;
-			ii->playeronfield[1] = false;
-			ii->playeronfield[2] = false;
-			ii->playeronfield[3] = false;
+		for (auto&& d : BlockList) {
+			d.playercount = 0;
+			d.life = 5;
+			d.lifetodrop = 0;
+			d.playeronfield[0] = false;
+			d.playeronfield[1] = false;
+			d.playeronfield[2] = false;
+			d.playeronfield[3] = false;
 
-			ii->hoverstate = false;
+			d.hoverstate = false;
 		}
 	}
 
@@ -199,11 +199,11 @@ void GameField::ResetField() {
 
 void GameField::SetPlayerOnField(int _playerid, int _row, int _column) {
 	if (!BlockList.empty()) {
-		for (ii = BlockList.begin(); ii != BlockList.end(); ii++) {
-			if (ii->row == _row && ii->column == _column) {
-				ii->playercount++;
-				ii->lifetodrop++;
-				ii->playeronfield[_playerid] = true;
+		for (auto&& d : BlockList) {
+			if (d.row == _row && d.column == _column) {
+				d.playercount++;
+				d.lifetodrop++;
+				d.playeronfield[_playerid] = true;
 				return;
 			}
 		}
@@ -213,20 +213,20 @@ void GameField::SetPlayerOnField(int _playerid, int _row, int _column) {
 void GameField::ChangePlayerPosition(int _playerid, int _row, int _column,
 	list<int> &_playerout) {
 	if (!BlockList.empty()) {
-		for (ii = BlockList.begin(); ii != BlockList.end(); ii++) {
+		for (auto&& d : BlockList) {
 			//Find Player
-			if (ii->playeronfield[_playerid]) {
+			if (d.playeronfield[_playerid]) {
 				//Deactivate Player on this field
-				ii->playeronfield[_playerid] = false;
-				ii->playercount--;
+				d.playeronfield[_playerid] = false;
+				d.playercount--;
 				//Decrease life of Block
-				ii->life -= ii->lifetodrop;
-				ii->lifetodrop = ii->playercount;
-				if (ii->life <= 0) { //Block is dead
-					ii->life = 0;
-					if (ii->playercount > 0) { //If there are still players on this block, the loose the game
+				d.life -= d.lifetodrop;
+				d.lifetodrop = d.playercount;
+				if (d.life <= 0) { //Block is dead
+					d.life = 0;
+					if (d.playercount > 0) { //If there are still players on this block, the loose the game
 						for (int i = 0; i < 4; i++) {
-							if (ii->playeronfield[i]) { //Go through all player and check if they are on this Block
+							if (d.playeronfield[i]) { //Go through all player and check if they are on this Block
 								_playerout.push_back(i);
 							}
 						}
@@ -236,12 +236,12 @@ void GameField::ChangePlayerPosition(int _playerid, int _row, int _column,
 			}
 		}
 		//Now set player on his new field
-		for (ii = BlockList.begin(); ii != BlockList.end(); ii++) {
+		for (auto&& d : BlockList) {
 			//Find new place
-			if (ii->row == _row && ii->column == _column) {
-				ii->playeronfield[_playerid] = true;
-				ii->playercount++;
-				ii->lifetodrop++;
+			if (d.row == _row && d.column == _column) {
+				d.playeronfield[_playerid] = true;
+				d.playercount++;
+				d.lifetodrop++;
 				break;
 			}
 		}
@@ -279,10 +279,10 @@ void GameField::MarkActivePlayer(int _playerid) {
 
 	//Outline of the Block, the player is on
 	if (!BlockList.empty()) {
-		for (ii = BlockList.begin(); ii != BlockList.end(); ii++) {
-			if (ii->playeronfield[_playerid]) {
-				outlinepos.x = ii->position.x;
-				outlinepos.y = ii->position.y;
+		for (auto&& d : BlockList) {
+			if (d.playeronfield[_playerid]) {
+				outlinepos.x = d.position.x;
+				outlinepos.y = d.position.y;
 				return;
 			}
 		}
@@ -305,10 +305,10 @@ bool GameField::CheckIfMoveIsPossible(int _playerid) {
 
 	//First of find the Block the player is on
 	if (!BlockList.empty()) {
-		for (ii = BlockList.begin(); ii != BlockList.end(); ii++) {
-			if (ii->playeronfield[_playerid]) {
-				tmprow = ii->row;
-				tmpcolumn = ii->column;
+		for (auto&& d : BlockList) {
+			if (d.playeronfield[_playerid]) {
+				tmprow = d.row;
+				tmpcolumn = d.column;
 				break;
 			}
 		}
@@ -319,12 +319,12 @@ bool GameField::CheckIfMoveIsPossible(int _playerid) {
 
 	//Now search for all adjacent blocks and check there life
 	if (!BlockList.empty()) {
-		for (ii = BlockList.begin(); ii != BlockList.end(); ii++) {
+		for (auto&& d : BlockList) {
 			//This Block is either under or over the player
-			if ((ii->row >= 0 && ii->row <= maxrow)
-				&& (ii->row == tmprow - 1 || ii->row == tmprow + 1)
-				&& ii->column == tmpcolumn) {
-				if (ii->life == 0) {
+			if ((d.row >= 0 && d.row <= maxrow)
+				&& (d.row == tmprow - 1 || d.row == tmprow + 1)
+				&& d.column == tmpcolumn) {
+				if (d.life == 0) {
 					countall++;
 					countoff++;
 				} else {
@@ -332,10 +332,10 @@ bool GameField::CheckIfMoveIsPossible(int _playerid) {
 				}
 			}
 			//This Block is either left or right of the player
-			if ((ii->column >= 0 && ii->column <= maxcolumn)
-				&& (ii->column == tmpcolumn - 1 || ii->column == tmpcolumn + 1)
-				&& ii->row == tmprow) {
-				if (ii->life == 0) {
+			if ((d.column >= 0 && d.column <= maxcolumn)
+				&& (d.column == tmpcolumn - 1 || d.column == tmpcolumn + 1)
+				&& d.row == tmprow) {
+				if (d.life == 0) {
 					countall++;
 					countoff++;
 				} else {
@@ -348,9 +348,9 @@ bool GameField::CheckIfMoveIsPossible(int _playerid) {
 	if (countall == countoff) { //All adjacent blocks are off
 		//Find the block the player ist on again and set its life to 0
 		if (!BlockList.empty()) {
-			for (ii = BlockList.begin(); ii != BlockList.end(); ii++) {
-				if (ii->playeronfield[_playerid]) {
-					ii->life = 0;
+			for (auto&& d : BlockList) {
+				if (d.playeronfield[_playerid]) {
+					d.life = 0;
 					break;
 				}
 			}
@@ -366,39 +366,39 @@ void GameField::HoverCheck(int MouseX, int MouseY, int _playerid) {
 
 	//First of find the Block the player is on
 	if (!BlockList.empty()) {
-		for (ii = BlockList.begin(); ii != BlockList.end(); ii++) {
-			if (ii->playeronfield[_playerid]) {
-				tmprow = ii->row;
-				tmpcolumn = ii->column;
+		for (auto&& d : BlockList) {
+			if (d.playeronfield[_playerid]) {
+				tmprow = d.row;
+				tmpcolumn = d.column;
 				break;
 			}
 		}
 
-		for (ii = BlockList.begin(); ii != BlockList.end(); ii++) {
-			if (MouseX >= ii->position.x
-				&& MouseX <= (ii->position.x + ii->position.w)) { //Mouse is on same X level with button
-				if (MouseY >= ii->position.y
-					&& MouseY <= (ii->position.y + ii->position.h)) { //Mouse is also on same Y level
+		for (auto&& d : BlockList) {
+			if (MouseX >= d.position.x
+				&& MouseX <= (d.position.x + d.position.w)) { //Mouse is on same X level with button
+				if (MouseY >= d.position.y
+					&& MouseY <= (d.position.y + d.position.h)) { //Mouse is also on same Y level
 					//Finds every collision with any Block
 					//Now needs to test if this Block is next to the block, the player is on
 					//This Block is either under or over the player
-					if ((ii->row >= 0 && ii->row <= maxrow)
-						&& (ii->row == tmprow - 1 || ii->row == tmprow + 1)
-						&& ii->column == tmpcolumn && ii->life >= 1) {
-						ii->hoverstate = true;
+					if ((d.row >= 0 && d.row <= maxrow)
+						&& (d.row == tmprow - 1 || d.row == tmprow + 1)
+						&& d.column == tmpcolumn && d.life >= 1) {
+						d.hoverstate = true;
 					}
 					//This Block is either left or right of the player
-					if ((ii->column >= 0 && ii->column <= maxcolumn)
-						&& (ii->column == tmpcolumn - 1
-						|| ii->column == tmpcolumn + 1)
-						&& ii->row == tmprow && ii->life >= 1) {
-						ii->hoverstate = true;
+					if ((d.column >= 0 && d.column <= maxcolumn)
+						&& (d.column == tmpcolumn - 1
+						|| d.column == tmpcolumn + 1)
+						&& d.row == tmprow && d.life >= 1) {
+						d.hoverstate = true;
 					}
 				} else {
-					ii->hoverstate = false;
+					d.hoverstate = false;
 				}
 			} else {
-				ii->hoverstate = false;
+				d.hoverstate = false;
 			}
 		}
 	}
@@ -410,43 +410,43 @@ bool GameField::Click(int MouseX, int MouseY, int _playerid, int &_newrow,
 
 	//First of find the Block the player is on
 	if (!BlockList.empty()) {
-		for (ii = BlockList.begin(); ii != BlockList.end(); ii++) {
-			if (ii->playeronfield[_playerid]) {
-				tmprow = ii->row;
-				tmpcolumn = ii->column;
+		for (auto&& d : BlockList) {
+			if (d.playeronfield[_playerid]) {
+				tmprow = d.row;
+				tmpcolumn = d.column;
 				break;
 			}
 		}
 
-		for (ii = BlockList.begin(); ii != BlockList.end(); ii++) {
-			if (MouseX >= ii->position.x
-				&& MouseX <= (ii->position.x + ii->position.w)) { //Mouse is on same X level with button
-				if (MouseY >= ii->position.y
-					&& MouseY <= (ii->position.y + ii->position.h)) { //Mouse is also on same Y level
+		for (auto&& d : BlockList) {
+			if (MouseX >= d.position.x
+				&& MouseX <= (d.position.x + d.position.w)) { //Mouse is on same X level with button
+				if (MouseY >= d.position.y
+					&& MouseY <= (d.position.y + d.position.h)) { //Mouse is also on same Y level
 					//Finds every collision with any Block
 					//Now needs to test if this Block is next to the block, the player is on
 					//This Block is either under or over the player
-					if ((ii->row >= 0 && ii->row <= maxrow)
-						&& (ii->row == tmprow - 1 || ii->row == tmprow + 1)
-						&& ii->column == tmpcolumn && ii->life >= 1) {
-						ii->hoverstate = false;
-						if (ii->row == tmprow - 1) {
+					if ((d.row >= 0 && d.row <= maxrow)
+						&& (d.row == tmprow - 1 || d.row == tmprow + 1)
+						&& d.column == tmpcolumn && d.life >= 1) {
+						d.hoverstate = false;
+						if (d.row == tmprow - 1) {
 							_newrow = tmprow - 1;
-						} else if (ii->row == tmprow + 1) {
+						} else if (d.row == tmprow + 1) {
 							_newrow = tmprow + 1;
 						}
 						_newcolumn = tmpcolumn;
 						return true;
 					}
 					//This Block is either left or right of the player
-					if ((ii->column >= 0 && ii->column <= maxcolumn)
-						&& (ii->column == tmpcolumn - 1
-						|| ii->column == tmpcolumn + 1)
-						&& ii->row == tmprow && ii->life >= 1) {
-						ii->hoverstate = false;
-						if (ii->column == tmpcolumn - 1) {
+					if ((d.column >= 0 && d.column <= maxcolumn)
+						&& (d.column == tmpcolumn - 1
+						|| d.column == tmpcolumn + 1)
+						&& d.row == tmprow && d.life >= 1) {
+						d.hoverstate = false;
+						if (d.column == tmpcolumn - 1) {
 							_newcolumn = tmpcolumn - 1;
-						} else if (ii->column == tmpcolumn + 1) {
+						} else if (d.column == tmpcolumn + 1) {
 							_newcolumn = tmpcolumn + 1;
 						}
 						_newrow = tmprow;
@@ -474,67 +474,67 @@ void GameField::SetPlayerCount(int _playercount) {
 
 void GameField::Render() {
 	if (!BlockList.empty()) {
-		for (ii = BlockList.begin(); ii != BlockList.end(); ii++) {
-			if (ii->life > 0) {
+		for (auto&& d : BlockList) {
+			if (d.life > 0) {
 				//Background
-				SDL_RenderCopy(renderer, ii->background, NULL, &ii->position);
+				SDL_RenderCopy(renderer, d.background, NULL, &d.position);
 
 				//Life
-				switch (ii->life) {
+				switch (d.life) {
 				case 1:
-					SDL_RenderCopy(renderer, ii->onetexture, NULL, &ii->position);
+					SDL_RenderCopy(renderer, d.onetexture, NULL, &d.position);
 					break;
 				case 2:
-					SDL_RenderCopy(renderer, ii->twotexture, NULL, &ii->position);
+					SDL_RenderCopy(renderer, d.twotexture, NULL, &d.position);
 					break;
 				case 3:
-					SDL_RenderCopy(renderer, ii->threetexture, NULL, &ii->position);
+					SDL_RenderCopy(renderer, d.threetexture, NULL, &d.position);
 					break;
 				case 4:
-					SDL_RenderCopy(renderer, ii->fourtexture, NULL, &ii->position);
+					SDL_RenderCopy(renderer, d.fourtexture, NULL, &d.position);
 					break;
 				case 5:
-					SDL_RenderCopy(renderer, ii->fivetexture, NULL, &ii->position);
+					SDL_RenderCopy(renderer, d.fivetexture, NULL, &d.position);
 					break;
 				}
 
 				//Player
-				if (ii->playercount == 1) {
-					if (ii->playeronfield[0]) {
-						SDL_RenderCopy(renderer, ii->playerred, NULL,
-							&ii->position);
-					} else if (ii->playeronfield[1]) {
-						SDL_RenderCopy(renderer, ii->playerblue, NULL,
-							&ii->position);
-					} else if (ii->playeronfield[2]) {
-						SDL_RenderCopy(renderer, ii->playergreen, NULL,
-							&ii->position);
-					} else if (ii->playeronfield[3]) {
-						SDL_RenderCopy(renderer, ii->playeryellow, NULL,
-							&ii->position);
+				if (d.playercount == 1) {
+					if (d.playeronfield[0]) {
+						SDL_RenderCopy(renderer, d.playerred, NULL,
+							&d.position);
+					} else if (d.playeronfield[1]) {
+						SDL_RenderCopy(renderer, d.playerblue, NULL,
+							&d.position);
+					} else if (d.playeronfield[2]) {
+						SDL_RenderCopy(renderer, d.playergreen, NULL,
+							&d.position);
+					} else if (d.playeronfield[3]) {
+						SDL_RenderCopy(renderer, d.playeryellow, NULL,
+							&d.position);
 					}
-				} else if (ii->playercount > 1) {
-					if (ii->playeronfield[0]) {
-						SDL_RenderCopy(renderer, ii->smalltextred, NULL,
-							&ii->smallposred);
+				} else if (d.playercount > 1) {
+					if (d.playeronfield[0]) {
+						SDL_RenderCopy(renderer, d.smalltextred, NULL,
+							&d.smallposred);
 					}
-					if (ii->playeronfield[1]) {
-						SDL_RenderCopy(renderer, ii->smalltextblue, NULL,
-							&ii->smallposblue);
+					if (d.playeronfield[1]) {
+						SDL_RenderCopy(renderer, d.smalltextblue, NULL,
+							&d.smallposblue);
 					}
-					if (ii->playeronfield[2]) {
-						SDL_RenderCopy(renderer, ii->smalltextgreen, NULL,
-							&ii->smallposgreen);
+					if (d.playeronfield[2]) {
+						SDL_RenderCopy(renderer, d.smalltextgreen, NULL,
+							&d.smallposgreen);
 					}
-					if (ii->playeronfield[3]) {
-						SDL_RenderCopy(renderer, ii->smalltextyellow, NULL,
-							&ii->smallposyellow);
+					if (d.playeronfield[3]) {
+						SDL_RenderCopy(renderer, d.smalltextyellow, NULL,
+							&d.smallposyellow);
 					}
 				}
 
 				//Hover
-				if (ii->hoverstate) {
-					SDL_RenderCopy(renderer, ii->hover, NULL, &ii->position);
+				if (d.hoverstate) {
+					SDL_RenderCopy(renderer, d.hover, NULL, &d.position);
 				}
 			}
 		}

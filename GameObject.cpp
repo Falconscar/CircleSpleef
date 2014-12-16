@@ -10,7 +10,7 @@
 GameObject::GameObject(SDL_Renderer *_renderer, SDL_Window *_window) {
 	window = _window;
 	renderer = _renderer;
-	fieldptr = NULL;
+	fieldptr = nullptr;
 	state = 0;
 
 	titleimg = IMG_Load("Resources/Misc/Title.png");

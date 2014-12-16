@@ -21,13 +21,14 @@
 #include <thread>
 #include <string>
 #include <sstream>
+#include <memory>
 using namespace std;
 
 #include "Button.h"
 #include "GameObject.h"
 //#include "GameField.h"  //Already done by the GameObject
 #include "InformationDisplay.h"
-#include "Socketstuff.hpp"
+#include "SocketCommunication.hpp"
 
 /*
  * Variables
@@ -100,8 +101,7 @@ int main(int argc, char *argv[]) {  //int argc, char ** argv
 	GameField Field(windowrenderer, 5, 5);
 	Game.SetField(&Field);
 
-	InformationDisplay *InfoDisp;
-	InfoDisp = new InformationDisplay;
+	auto InfoDisp = new InformationDisplay;
 	InfoDisp->SetRenderer(windowrenderer);
 
 	while (!quit) {
@@ -246,7 +246,7 @@ int main(int argc, char *argv[]) {  //int argc, char ** argv
 					list<int> playerloose; //A list to store the players in, that loose the game in this round
 					list<int>::iterator playerlooseii;
 
-					try { //I have no idea why this needs to be here, but without it the program crashes
+					try {
 						playerloose.push_back(1);
 						playerloose.clear();
 					}
@@ -258,9 +258,8 @@ int main(int argc, char *argv[]) {  //int argc, char ** argv
 						tmpmcolumn, playerloose);
 
 					if (!playerloose.empty()) {
-						for (playerlooseii = playerloose.begin(); playerlooseii != playerloose.end();
-							playerlooseii++) { //Go through the list of players that lost the game
-							mul_playeralive[*playerlooseii] = false;
+						for (auto&& d : playerloose) { //Go through the list of players that lost the game
+							mul_playeralive[d] = false;
 						}
 
 						//Mark the players that are out of the game
@@ -419,7 +418,7 @@ int main(int argc, char *argv[]) {  //int argc, char ** argv
 							list<int> playerloose; //A list to store the players in, that loose the game in this round
 							list<int>::iterator playerlooseii;
 
-							try { //I have no idea why this needs to be here, but without it the program crashes
+							try {
 								playerloose.push_back(1);
 								playerloose.clear();
 							}
@@ -431,9 +430,8 @@ int main(int argc, char *argv[]) {  //int argc, char ** argv
 								newcolumn, playerloose);
 
 							if (!playerloose.empty()) {
-								for (playerlooseii = playerloose.begin(); playerlooseii != playerloose.end();
-									playerlooseii++) { //Go through the list of players that lost the game
-									playeralive[*playerlooseii] = false;
+								for (auto&& d : playerloose) { //Go through the list of players that lost the game
+									playeralive[d] = false;
 								}
 
 								//Mark the players that are out of the game
@@ -493,7 +491,7 @@ int main(int argc, char *argv[]) {  //int argc, char ** argv
 							list<int> playerloose; //A list to store the players in, that loose the game in this round
 							list<int>::iterator playerlooseii;
 
-							try { //I have no idea why this needs to be here, but without it the program crashes
+							try {
 								playerloose.push_back(1);
 								playerloose.clear();
 							}
@@ -505,9 +503,8 @@ int main(int argc, char *argv[]) {  //int argc, char ** argv
 								newcolumn, playerloose);
 
 							if (!playerloose.empty()) {
-								for (playerlooseii = playerloose.begin(); playerlooseii != playerloose.end();
-									playerlooseii++) { //Go through the list of players that lost the game
-									mul_playeralive[*playerlooseii] = false;
+								for (auto&& d : playerloose) { //Go through the list of players that lost the game
+									mul_playeralive[d] = false;
 								}
 
 								//Mark the players that are out of the game

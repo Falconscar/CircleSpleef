@@ -1,13 +1,13 @@
 #include "InformationDisplay.h"
 
 InformationDisplay::InformationDisplay() {
-	renderer = NULL;
+	renderer = nullptr;
 
 	infoimg = IMG_Load("Resources/Text/Info.png");
 	errorimg = IMG_Load("Resources/Text/Error.png");
 
-	infotext = NULL;
-	errortext = NULL;
+	infotext = nullptr;
+	errortext = nullptr;
 
 	for (int i = 0; i < 7; i++) {
 		inpos[i].w = 400;
