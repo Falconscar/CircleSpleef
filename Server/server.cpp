@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/types.h> 
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <sstream>
@@ -18,9 +18,7 @@
 #include <vector>
 #include <thread>
 
-using namespace std;
-
-void manageOneLobby(vector<int> _lobbysocks, int _maxplayers);
+void manageOneLobby(std::vector<int> _lobbysocks, int _maxplayers);
 void acceptAConnection(int &_newsock, bool &_connected, int &_sockfd,
 struct sockaddr_in &_cli_addr, socklen_t &_clilen);
 
@@ -36,7 +34,7 @@ int numberofplayers = 0;
 int whosturn = 0;
 
 //Initialization
-vector<int> holdingsock; //All new connections go here
+std::vector<int> holdingsock; //All new connections go here
 int sockfd, newsockfd, portno;
 socklen_t clilen;
 char buffer[256];
@@ -103,7 +101,7 @@ int main(int argc, char **argv) {
 						n = write(holdingsock[0], "update", 6);
 						if (n < 0) {
 							//The first client has left the lobby
-							cout << "The first player has left the lobby" << endl;
+							std::cout << "The first player has left the lobby" << std::endl;
 							numberofplayers = 0; //Reset the lobby
 							holdingsock.erase(holdingsock.begin());
 						}
@@ -123,22 +121,22 @@ int main(int argc, char **argv) {
 		int starttime = time(NULL);
 
 		while (time(NULL) - starttime <= 20 && numberofplayers < 4) {
-			cout << "Searching for extra players" << endl;
+			std::cout << "Searching for extra players" << std::endl;
 			listen(sockfd, 5);
 			clilen = sizeof(cli_addr);
 
 			bool conn = false;
-			thread connth(acceptAConnection, ref(newsockfd), ref(conn), ref(sockfd), ref(cli_addr), ref(clilen));
+			std::thread connth(acceptAConnection, std::ref(newsockfd), std::ref(conn), std::ref(sockfd), std::ref(cli_addr), std::ref(clilen));
 			connth.detach();
 			while (!conn) {
 				if (time(NULL) - starttime <= 20) {
-					//cout << "Waiting for another player" << endl;
+					//std::cout << "Waiting for another player" << std::endl;
 				} else {
 					break;
 				}
 			}
 			if (!conn) { //Still no connection
-				cout << "No additional players" << endl;
+				std::cout << "No additional players" << std::endl;
 				break;
 			}
 
@@ -179,7 +177,7 @@ int main(int argc, char **argv) {
 			}
 		}
 
-		thread tmpth(manageOneLobby, holdingsock, numberofplayers);
+		std::thread tmpth(manageOneLobby, holdingsock, numberofplayers);
 		tmpth.detach();
 	}
 
@@ -187,8 +185,8 @@ int main(int argc, char **argv) {
 	return 0;
 }
 
-void manageOneLobby(vector<int> _lobbysocks, int _maxplayers) {
-	vector<int>::iterator ii;
+void manageOneLobby(std::vector<int> _lobbysocks, int _maxplayers) {
+	std::vector<int>::iterator ii;
 	int whosturn = 0;
 
 	int output = _maxplayers;
@@ -199,8 +197,8 @@ void manageOneLobby(vector<int> _lobbysocks, int _maxplayers) {
 	whosturn = randomplayer - 1;
 
 	bool errorinlobby = false;
-	vector<int> no;
-	vector<int>::iterator nono;
+	std::vector<int> no;
+	std::vector<int>::iterator nono;
 
 	//Send the number of players to all clients and a random starter
 	for (ii = _lobbysocks.begin(); ii != _lobbysocks.end(); ii++) {
@@ -209,10 +207,10 @@ void manageOneLobby(vector<int> _lobbysocks, int _maxplayers) {
 		out << output;
 		sbufstr = out.str();
 		char *s = (char *)sbufstr.c_str();
-		cout << s << endl;
+		std::cout << s << std::endl;
 		n = write(*ii, (void *)s, 2);
 		if (n < 0) {
-			cout << "Client is out of reach" << endl;
+			std::cout << "Client is out of reach" << std::endl;
 			no.push_back(*ii);
 			errorinlobby = true;
 		}
@@ -224,7 +222,7 @@ void manageOneLobby(vector<int> _lobbysocks, int _maxplayers) {
 		if (!errorinlobby) {
 			n = write(*ii, "starting", 8);
 			if (n < 0) {
-				cout << "Cant write starting" << endl;
+				std::cout << "Cant write starting" << std::endl;
 			}
 		} else {
 			bool problem = false;
@@ -238,20 +236,20 @@ void manageOneLobby(vector<int> _lobbysocks, int _maxplayers) {
 			if (!problem) {
 				n = write(*ii, "errorwithlobby", 14);
 				if (n < 0) {
-					cout << "Cant write errorwithlobby" << endl;
+					std::cout << "Cant write errorwithlobby" << std::endl;
 				}
 			}
 		}
 	}
 	if (errorinlobby) {
-		cout << "Closing Lobby" << endl;
+		std::cout << "Closing Lobby" << std::endl;
 		return; //Lobby can be closed because of an error
 	}
 	puts("All clients were sent the start signal");
 
 	//From here on out the game has started and the server is now always receiving inputs, he than broadcasts them to all
-	vector<int> disconnectv;
-	vector<int>::iterator discoii;
+	std::vector<int> disconnectv;
+	std::vector<int>::iterator discoii;
 	while (true) {
 		bzero(buffer, 256);
 		n = read(_lobbysocks[whosturn], buffer, 255);
@@ -268,7 +266,7 @@ void manageOneLobby(vector<int> _lobbysocks, int _maxplayers) {
 		//If the message is "disconnect" then send all clients an error message
 		char tmpdc[] = "disconnect";
 		if (!strcmp(buffer, tmpdc)) {
-			cout << "Received a disconnect" << endl;
+			std::cout << "Received a disconnect" << std::endl;
 			//One client that should be playing has disconnected
 			//Send to everyone that the lobby is closed
 			for (ii = _lobbysocks.begin(); ii != _lobbysocks.end(); ii++) {
@@ -285,14 +283,14 @@ void manageOneLobby(vector<int> _lobbysocks, int _maxplayers) {
 					}
 				}
 			}
-			cout << "Informed all clients about an error" << endl;
+			std::cout << "Informed all clients about an error" << std::endl;
 			return;
 		}
 
 		//If the message is "win" then send all clients a lost message
 		char tmpwin[] = "win";
 		if (!strcmp(buffer, tmpwin)) {
-			cout << "Received a win" << endl;
+			std::cout << "Received a win" << std::endl;
 			//One client has won the game
 			//Send to everyone else that they have lost
 			for (ii = _lobbysocks.begin(); ii != _lobbysocks.end(); ii++) {
@@ -309,7 +307,7 @@ void manageOneLobby(vector<int> _lobbysocks, int _maxplayers) {
 					}
 				}
 			}
-			cout << "Informed all clients that they lost" << endl;
+			std::cout << "Informed all clients that they lost" << std::endl;
 			return;
 		}
 
@@ -327,12 +325,12 @@ void manageOneLobby(vector<int> _lobbysocks, int _maxplayers) {
 			if (!sendingtodisco) {
 				n = write(*ii, buffer, 18);
 				if (n < 0) {
-					cout << "Error while sending" << endl;
+					std::cout << "Error while sending" << std::endl;
 					disconnectv.push_back(*ii);
 				}
 			}
 		}
-		cout << endl;
+		std::cout << std::endl;
 		puts("All clients were sent the move");
 
 		whosturn = buffer[3] - 49; //Set the new player

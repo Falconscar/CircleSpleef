@@ -1,17 +1,10 @@
-//============================================================================
-// Name        : main.cpp
-// Author      : Leon Eck
-// Version     : 1.0
-// Copyright   : Copyright Leon Eck 2014
-//============================================================================
-
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
-
 #include <SDL.h>
 
-#include <winsock2.h>
-#include <windows.h>
-#pragma comment(lib,"ws2_32.lib") //Winsock Library
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
 
 #include <iostream>
 #include <stdio.h>
@@ -26,7 +19,6 @@ using namespace std;
 
 #include "Button.h"
 #include "GameObject.h"
-//#include "GameField.h"  //Already done by the GameObject
 #include "InformationDisplay.h"
 #include "SocketCommunication.hpp"
 

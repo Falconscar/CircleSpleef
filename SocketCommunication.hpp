@@ -1,8 +1,8 @@
 const int clientVersionNumber = 1; //Software version of the client to check against the server
 
 //Socket
-WSADATA wsa;
-SOCKET s;
+//WSADATA wsa;
+int s;
 struct sockaddr_in server;
 char *message, server_reply[2000];
 int recv_size;
@@ -19,21 +19,24 @@ int mul_whosturn = 1;
 
 void WaitForAnswer(bool &_received) {
 	//Now await an answer from the server
-	if ((recv_size = recv(s, server_reply, 2000, 0)) == SOCKET_ERROR) {
+	/*if ((recv_size = recv(s, server_reply, 2000, 0)) == SOCKET_ERROR) {
 		puts("recv failed");
-	}
+	}*/
+	recv_size = recv(s, server_reply, 2000, 0);
 
 	_received = true;
 }
 
 void InitializeSocketConnection(InformationDisplay *_infoptr, GameObject *_gameptr) {
-	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
+	/*if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
 		printf("Failed. Error Code : %d", WSAGetLastError());
 		return;
 	}
 	if ((s = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
 		printf("Could not create socket : %d", WSAGetLastError());
-	}
+	}*/
+
+	s = socket(AF_INET, SOCK_STREAM, 0);
 
 	server.sin_addr.s_addr = inet_addr("178.254.39.73");
 	server.sin_family = AF_INET;
@@ -59,9 +62,10 @@ void InitializeSocketConnection(InformationDisplay *_infoptr, GameObject *_gamep
 	}
 
 	//Now wait for the feedback from the server
-	if ((recv_size = recv(s, server_reply, 2000, 0)) == SOCKET_ERROR) {
+	/*if ((recv_size = recv(s, server_reply, 2000, 0)) == SOCKET_ERROR) {
 		puts("recv failed");
-	}
+	}*/
+	recv_size = recv(s, server_reply, 2000, 0);
 
 	//Add a NULL terminating character to make it a proper string before printing
 	server_reply[recv_size] = '\0';
@@ -117,9 +121,10 @@ void JoinGame(bool &_gamestarted, bool &_reset, InformationDisplay *_infoptr, Ga
 			cout << "You are the first player in the lobby. You are now waiting for more players." << endl;
 			_infoptr->SetToRender(2);
 			//Wait for an update in the lobby
-			if ((recv_size = recv(s, server_reply, 2000, 0)) == SOCKET_ERROR) {
+			/*if ((recv_size = recv(s, server_reply, 2000, 0)) == SOCKET_ERROR) {
 				puts("recv failed");
-			}
+			}*/
+			recv_size = recv(s, server_reply, 2000, 0);
 			//Add a NULL terminating character to make it a proper string before printing
 			server_reply[recv_size] = '\0';
 			puts(server_reply);
@@ -134,9 +139,10 @@ void JoinGame(bool &_gamestarted, bool &_reset, InformationDisplay *_infoptr, Ga
 		}
 
 		//Now wait for the loby settings
-		if ((recv_size = recv(s, server_reply, 2, 0)) == SOCKET_ERROR) { //Only accept 2 characters here
+		/*if ((recv_size = recv(s, server_reply, 2, 0)) == SOCKET_ERROR) { //Only accept 2 characters here
 			puts("recv failed");
-		}
+		}*/
+		recv_size = recv(s, server_reply, 2, 0);
 
 		//Add a NULL terminating character to make it a proper string before printing
 		server_reply[recv_size] = '\0';
@@ -144,15 +150,16 @@ void JoinGame(bool &_gamestarted, bool &_reset, InformationDisplay *_infoptr, Ga
 
 		//Change local settings
 		char buffer[10];
-		strncpy_s(buffer, server_reply, 2); //Get the first character of the reply
+		strncpy(buffer, server_reply, 2); //Get the first character of the reply
 		int tmpnum = strtol(buffer, &pEnd, 10);
 		mul_numberofplayers = tmpnum / 10;
 		mul_whosturn = tmpnum % 10;
 
 		//Now wait for the start signal
-		if ((recv_size = recv(s, server_reply, 2000, 0)) == SOCKET_ERROR) {
+		/*if ((recv_size = recv(s, server_reply, 2000, 0)) == SOCKET_ERROR) {
 			puts("recv failed");
-		}
+		}*/
+		recv_size = recv(s, server_reply, 2000, 0);
 
 		//Add a NULL terminating character to make it a proper string before printing
 		server_reply[recv_size] = '\0';
@@ -202,9 +209,10 @@ void GetMove(int &player, int &_row, int &_column, int &_newturn, bool &_receive
 
 	while (errorcheck) {
 		//Wait for the move
-		if ((recv_size = recv(s, server_reply, 2000, 0)) == SOCKET_ERROR) {
+		/*if ((recv_size = recv(s, server_reply, 2000, 0)) == SOCKET_ERROR) {
 			puts("recv failed");
-		}
+		}*/
+		recv_size = recv(s, server_reply, 2000, 0);
 
 		//Add a NULL terminating character to make it a proper string before printing
 		server_reply[recv_size] = '\0';
